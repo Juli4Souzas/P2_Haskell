@@ -1,0 +1,5 @@
+{
+	"name": "Haskell aula",
+	"image": "haskell:9.10",
+	"forwardPorts": [8080]
+}

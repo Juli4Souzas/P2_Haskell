@@ -1,0 +1,13 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: stockeasy
+      MYSQL_USER: stockeasy
+      MYSQL_PASSWORD: "${STOCKEASY_DB_PASSWORD:?Configure o segredo no Codespaces}"
+      MYSQL_ROOT_PASSWORD: "${STOCKEASY_DB_ROOT_PASSWORD:?Configure o segredo no Codespaces}"
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - ./.mysql-data:/var/lib/mysql
+      - ./stockeasy.sql:/docker-entrypoint-initdb.d/01-stockeasy.sql:ro
