@@ -9,14 +9,9 @@ O sistema foi desenvolvido como projeto acadêmico de **Haskell** para organizar
 ---
 
 <p align="center">
-  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdDh0bGFxZmE0bnF6aXBiNXA0MnJoOGsyd2NpcjdwYzdsdGgwdnE0NyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/wbp3YSoF7FhT3XyjeE/giphy.gif" width="350" alt="GIF animado de apresentação do StockEasy">
+  <img src="https://media.giphy.com/media/wbp3YSoF7FhT3XyjeE/giphy.gif" width="350" alt="GIF animado de apresentação do StockEasy" />
 </p>
 
-
-
-<p align="center">
-  <img src="https://media.giphy.com/media/wbp3YSoF7FhT3XyjeE/giphy.gif" width="300" alt="Cat eating ice cream" />
-</p>
 ---
 
 ## 🎯 Objetivo
