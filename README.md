@@ -1,27 +1,35 @@
-# 🩸 Rede+Sangue
+# 🍦 StockEasy
 
-Sistema para **gestão de estoque de bolsas de sangue**, desenvolvido como projeto acadêmico de **Haskell**.
+**Qual sorvete vender primeiro?** O StockEasy ajuda a equipe da **Sorveteria Pinpinela** a responder essa pergunta antes de abrir o freezer.
 
-O Rede+Sangue tem como objetivo auxiliar a administração das bolsas de sangue, proporcionando maior organização, segurança e eficiência no controle dos recursos sanguíneos.
+O sistema foi desenvolvido como projeto acadêmico de **Haskell** para organizar o estoque de picolés e potes de sorvete. Cada lote tem sua própria quantidade e data de validade, então dá para acompanhar entregas diferentes do mesmo sabor.
 
-> 🚧 **Status: Em desenvolvimento**
+> 🚧 **Status do projeto:** Em desenvolvimento
 
 ---
 
 <p align="center">
-  <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGxhMzdqczh6MHMzNHMzZ21ibWxvamlubjJpYWdwaGgwY2NkOGdqNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o6MbeA9YIiPXRRJdu/giphy.gif" width="700">
+  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdDh0bGFxZmE0bnF6aXBiNXA0MnJoOGsyd2NpcjdwYzdsdGgwdnE0NyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/wbp3YSoF7FhT3XyjeE/giphy.gif" width="350" alt="GIF animado de apresentação do StockEasy">
 </p>
 
----
-
-## Objetivo
-
-O sistema está sendo desenvolvido para centralizar e facilitar os processos relacionados à gestão de um estoque de bolsas de sangue.
-
-Entre as principais funcionalidades planejadas estão:
-
-* Cadastro e controle de bolsas de sangue;
-* Controle de estoque;
-* Monitoramento da validade das bolsas;
+<img src="https://media.giphy.com/media/wbp3YSoF7FhT3XyjeE/giphy.gif" width="250" alt="Cat eating ice cream meme" />
 
 ---
+
+## 🎯 Objetivo
+
+Ajudar a sorveteria a acompanhar o estoque e reduzir desperdícios. Se dois lotes de picolé de morango têm validades diferentes, a **Vitrine do Dia** destaca o que vence primeiro. Se um lote já passou da validade, ele aparece no filtro de **Vencidos**.
+
+## 🍨 O que tem no StockEasy?
+
+- **Vitrine do Dia** — mostra o lote que deve sair primeiro e os próximos vencimentos.
+- **Estoque** — reúne os lotes com suas quantidades e validades. Na demonstração, é possível registrar entradas e saídas, filtrar os vencidos e consultar produtos com saldo baixo.
+- **Cardápio** — organiza os sabores e as linhas, como Fruta e Leite. No cadastro de cada lote, a equipe combina essas opções com a categoria Picolé ou Pote.
+
+## 🛠️ Tecnologias
+
+| Camada | Tecnologias |
+| --- | --- |
+| Interface | React, Vite e CSS |
+| API | Haskell e Servant |
+| Banco de dados | MySQL |
