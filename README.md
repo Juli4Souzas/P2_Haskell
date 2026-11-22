@@ -19,9 +19,9 @@ Ajudar a sorveteria a acompanhar o estoque e reduzir desperdícios. Se dois lote
 
 ## O que tem no StockEasy?
 
-- **Vitrine do Dia** — mostra o lote que deve sair primeiro e os próximos vencimentos.
-- **Estoque** — reúne os lotes com suas quantidades e validades. Na demonstração, é possível registrar entradas e saídas, filtrar os vencidos e consultar produtos com saldo baixo.
-- **Cardápio** — organiza os sabores e as linhas, como Fruta e Leite. No cadastro de cada lote, a equipe combina essas opções com a categoria Picolé ou Pote.
+- **Vitrine do Dia** - mostra o lote que deve sair primeiro e os próximos vencimentos.
+- **Estoque** - reúne os lotes com suas quantidades e validades. Na demonstração, é possível registrar entradas e saídas, filtrar os vencidos e consultar produtos com saldo baixo.
+- **Cardápio** - organiza os sabores e as linhas, como Fruta e Leite. No cadastro de cada lote, a equipe combina essas opções com a categoria Picolé ou Pote.
 
 ## Tecnologias
 
