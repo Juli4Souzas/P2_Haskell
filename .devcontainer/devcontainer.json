@@ -1,5 +1,8 @@
 {
-	"name": "Haskell aula",
-	"image": "haskell:9.10",
-	"forwardPorts": [8080]
+  "name": "StockEasy",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [5173, 8080]
 }

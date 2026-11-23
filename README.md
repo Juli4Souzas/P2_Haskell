@@ -37,3 +37,56 @@ Ajudar a sorveteria a acompanhar o estoque e reduzir desperdícios. Se dois lote
 | Interface | React, Vite e CSS |
 | API | Haskell e Servant |
 | Banco de dados | MySQL |
+
+## 📁 Estrutura
+
+```
+├── backend/                 API em Haskell (Servant + Warp)
+│   ├── app/
+│   │   ├── Main.hs          inicia o servidor na porta 8080
+│   │   ├── Models.hs        tipos (Cadastro, Lote, Saida)
+│   │   ├── Queries.hs       consultas SQL (mysql-simple)
+│   │   └── Handler.hs       rotas (type API) e handlers
+│   ├── stockeasy.cabal
+│   └── Dockerfile
+├── database/
+│   ├── stockeasy.sql        criação das tabelas
+│   └── massa_teste.sql      dados de teste
+├── frontend/                React + Vite
+└── compose.yaml             sobe MySQL + API + front
+```
+
+## 🔌 Rotas
+
+| Método | Rota | Corpo |
+| --- | --- | --- |
+| GET | `/api/categorias` | – |
+| GET / POST | `/api/sabores` | `{ "id": 0, "nome": "Pistache" }` |
+| PUT / DELETE | `/api/sabores/:id` | `{ "id": 1, "nome": "Pistache" }` |
+| GET / POST | `/api/linhas` | igual a sabores |
+| PUT / DELETE | `/api/linhas/:id` | igual a sabores |
+| GET / POST | `/api/lotes` | `{ "id": 0, "sabor_id": 1, "categoria_id": 1, "linha_id": 1, "quantidade": 10, "validade": "2026-12-01" }` |
+| PUT / DELETE | `/api/lotes/:id` | mesmo corpo do POST |
+| POST | `/api/lotes/:id/saida` | `{ "saida": 3 }` |
+
+## ▶️ Como rodar
+
+Precisa só do Docker (o Codespace já vem com ele; no PC, instale o Docker Desktop).
+Na raiz do projeto:
+
+```bash
+docker compose up --build
+```
+
+Isso sobe o MySQL (com a massa de teste), a API Haskell e o front.
+A primeira vez demora (10–20 min), porque compila as bibliotecas do Haskell; depois fica em cache.
+
+- Front: porta **5173** (no Codespace, aba **PORTS**)
+- API: `http://localhost:8080/api/lotes`
+
+| Para... | Comando |
+| --- | --- |
+| Parar | `Ctrl+C` |
+| Recompilar depois de mexer no Haskell | `docker compose up --build` |
+| Apagar o banco e recarregar a massa de teste | `docker compose down` e `rm -rf .mysql-data` |
+| Entrar no MySQL | `docker compose exec mysql mysql -ustockeasy -pstockeasy pimpinella` |
