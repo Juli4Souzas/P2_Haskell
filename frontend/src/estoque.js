@@ -1,3 +1,4 @@
+// Horário de Brasília (UTC-3). O IANA não tem "America/Brasilia": o fuso oficial é este.
 export const fuso = "America/Sao_Paulo";
 
 export function hoje() {

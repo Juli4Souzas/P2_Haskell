@@ -1,53 +1,6 @@
-import React, { createContext, useContext, useEffect, useMemo, useRef } from "react";
+import React from "react";
 
-/* ------------------------------------------------------------------ *
- * Movimento: pausa manual + preferência do sistema (definido no App)
- * ------------------------------------------------------------------ */
-export const Movimento = createContext(false);
-export const usarPausado = () => useContext(Movimento);
-
-/* ------------------------------------------------------------------ *
- * Relógio compartilhado: um único requestAnimationFrame move todas as
- * formas da página, e cada forma só roda enquanto está visível.
- * ------------------------------------------------------------------ */
-const assinantes = new Set();
-let quadro = 0;
-
-function ciclo(agora) {
-  for (const passo of assinantes) passo(agora);
-  quadro = assinantes.size ? requestAnimationFrame(ciclo) : 0;
-}
-
-function assinar(passo) {
-  assinantes.add(passo);
-  if (!quadro) quadro = requestAnimationFrame(ciclo);
-  return () => assinantes.delete(passo);
-}
-
-// `desenhar` recebe o tempo acumulado (ms) da própria forma. O tempo só avança
-// enquanto ela roda, então pausar e retomar nunca causa um salto de forma.
-function usarRelogio(ref, desenhar, pausado, inicio = 0, observar = true) {
-  const tempo = useRef(inicio);
-  useEffect(() => {
-    if (pausado) return;
-    let ultimo = null;
-    let cancelar = null;
-    const passo = agora => {
-      if (ultimo !== null) tempo.current += Math.min(agora - ultimo, 64);
-      ultimo = agora;
-      desenhar(tempo.current);
-    };
-    const ligar = () => { if (!cancelar) { ultimo = null; cancelar = assinar(passo); } };
-    const desligar = () => { cancelar?.(); cancelar = null; };
-    if (!observar) {
-      ligar();
-      return desligar;
-    }
-    const io = new IntersectionObserver(([entrada]) => (entrada.isIntersecting ? ligar() : desligar()));
-    io.observe(ref.current);
-    return () => { io.disconnect(); desligar(); };
-  }, [pausado]);
-}
+// Formas orgânicas da página. Todas são desenhadas uma vez e ficam paradas.
 
 /* ------------------------------------------------------------------ *
  * Geometria: curva fechada e suave (Catmull-Rom → Bézier)
@@ -67,7 +20,7 @@ function curvaFechada(pontos) {
   return `${d}Z`;
 }
 
-// Forma líquida no quadro 0–100: cada ponto do contorno respira em ritmo próprio.
+// Forma líquida no quadro 0–100. `t` escolhe o desenho do contorno (cada `sem` dá uma forma diferente).
 export function formaBlob(t, { pontos = 7, amp = .16, vel = .0005, sem = 1 } = {}) {
   const contorno = [];
   for (let i = 0; i < pontos; i++) {
@@ -81,43 +34,33 @@ export function formaBlob(t, { pontos = 7, amp = .16, vel = .0005, sem = 1 } = {
 }
 
 /* ------------------------------------------------------------------ *
- * Blob: mancha de cor sólida que se transforma devagar
+ * Blob: mancha de cor sólida, parada
  * cor: ouro | rosa | salvia | areia | ceu
  * ------------------------------------------------------------------ */
-export function Blob({ cor = "ouro", className = "", style, estatico = false, ...forma }) {
-  const pausado = usarPausado();
-  const svg = useRef(null);
-  const caminho = useRef(null);
-  const opcoes = { pontos: 7, amp: .16, vel: .0005, sem: 1, ...forma };
-  const inicio = opcoes.sem * 2300;
-  const inicial = useMemo(() => formaBlob(inicio, opcoes), []);
-  usarRelogio(svg, t => caminho.current?.setAttribute("d", formaBlob(t, opcoes)), pausado || estatico, inicio);
-  return <svg ref={svg} className={`blob ${className}`} style={style} viewBox="0 0 100 100"
+// pontos, amp, vel e sem só escolhem o desenho; nada se mexe.
+export function Blob({ cor = "ouro", className = "", style, pontos = 7, amp = .16, vel = .0005, sem = 1 }) {
+  const d = formaBlob(sem * 2300, { pontos, amp, vel, sem });
+  return <svg className={`blob ${className}`} style={style} viewBox="0 0 100 100"
     preserveAspectRatio="none" aria-hidden="true" focusable="false">
-    <path ref={caminho} d={inicial} style={{ fill: `var(--${cor})` }} />
+    <path d={d} style={{ fill: `var(--${cor})` }} />
   </svg>;
 }
 
-// A foto permanece parada enquanto o contorno orgânico muda.
-const formaProposito = { pontos: 8, amp: .16, vel: .00055, sem: 2 };
-const inicioProposito = 1100;
+// Recorte orgânico da foto da seção "Para que serve o StockEasy?".
+const contornoProposito = formaBlob(1100, { pontos: 8, amp: .16, vel: .00055, sem: 2 });
 
-export function MascaraProposito({ alvo }) {
-  const pausado = usarPausado();
-  const caminho = useRef(null);
-  const inicial = useMemo(() => formaBlob(inicioProposito, formaProposito), []);
-  usarRelogio(alvo, tempo => caminho.current?.setAttribute("d", formaBlob(tempo, formaProposito)), pausado, inicioProposito);
+export function MascaraProposito() {
   return <svg className="mascaras" width="0" height="0" aria-hidden="true" focusable="false">
     <defs>
       <clipPath id="mascara-proposito" clipPathUnits="objectBoundingBox">
-        <path ref={caminho} d={inicial} transform="translate(-0.068 -0.068) scale(0.01136)" />
+        <path d={contornoProposito} transform="translate(-0.068 -0.068) scale(0.01136)" />
       </clipPath>
     </defs>
   </svg>;
 }
 
 /* ------------------------------------------------------------------ *
- * Divisor: borda de seção que ondula e, na parte de baixo, derrete em gotas
+ * Divisor: borda ondulada de seção; na parte de baixo, com gotas escorrendo (parado)
  * lado "cima": a faixa começa aqui (onda sobe sobre a seção anterior)
  * lado "baixo": a faixa termina aqui (gotas escorrem sobre a próxima seção)
  * ------------------------------------------------------------------ */
@@ -142,40 +85,19 @@ function comprimentoGota(indice, t) {
   return 10 + 30 * (.5 + .5 * fase);
 }
 
-export function Divisor({ cor = "rosa", lado = "cima", gotas = 0, velocidade = 1, amplitude = 1 }) {
-  const pausado = usarPausado();
-  const svg = useRef(null);
-  const onda = useRef(null);
-  const linhas = useRef([]);
-  const pontas = useRef([]);
-  const inicio = lado === "cima" ? 900 : 3400;
+export function Divisor({ cor = "rosa", lado = "cima", gotas = 0, amplitude = 1 }) {
+  const t = lado === "cima" ? 900 : 3400;
   const quantidade = lado === "baixo" ? Math.min(gotas, posicoesGotas.length) : 0;
-
-  const desenhar = t => {
-    onda.current?.setAttribute("d", caminhoOnda(t, lado, amplitude));
-    for (let i = 0; i < quantidade; i++) {
+  return <svg className={`divisor divisor-${lado} divisor-${cor}`} viewBox={`0 0 ${LARGURA} ${ALTURA}`}
+    preserveAspectRatio={lado === "cima" ? "xMidYMax slice" : "xMidYMin slice"} aria-hidden="true" focusable="false">
+    <path d={caminhoOnda(t, lado, amplitude)} />
+    {Array.from({ length: quantidade }, (_, i) => {
       const x = posicoesGotas[i] * LARGURA;
       const topo = alturaOnda(x, t, lado, amplitude) - 4;
       const ponta = alturaOnda(x, t, lado, amplitude) + comprimentoGota(i, t);
-      linhas.current[i]?.setAttribute("y1", n2(topo));
-      linhas.current[i]?.setAttribute("y2", n2(ponta));
-      pontas.current[i]?.setAttribute("cy", n2(ponta));
-    }
-  };
-
-  const inicial = useMemo(() => caminhoOnda(inicio, lado, amplitude), [inicio, lado, amplitude]);
-  usarRelogio(svg, tempo => desenhar(inicio + (tempo - inicio) * velocidade), pausado, inicio);
-
-  return <svg ref={svg} className={`divisor divisor-${lado} divisor-${cor}`} viewBox={`0 0 ${LARGURA} ${ALTURA}`}
-    preserveAspectRatio={lado === "cima" ? "xMidYMax slice" : "xMidYMin slice"} aria-hidden="true" focusable="false">
-    <path ref={onda} d={inicial} />
-    {Array.from({ length: quantidade }, (_, i) => {
-      const x = posicoesGotas[i] * LARGURA;
-      const topo = alturaOnda(x, inicio, lado, amplitude) - 4;
-      const ponta = alturaOnda(x, inicio, lado, amplitude) + comprimentoGota(i, inicio);
       return <g key={i}>
-        <line ref={el => (linhas.current[i] = el)} x1={x} x2={x} y1={n2(topo)} y2={n2(ponta)} />
-        <circle ref={el => (pontas.current[i] = el)} cx={x} cy={n2(ponta)} r="11" />
+        <line x1={x} x2={x} y1={n2(topo)} y2={n2(ponta)} />
+        <circle cx={x} cy={n2(ponta)} r="11" />
       </g>;
     })}
   </svg>;
@@ -183,19 +105,18 @@ export function Divisor({ cor = "rosa", lado = "cima", gotas = 0, velocidade = 1
 
 /* ------------------------------------------------------------------ *
  * Ilustrações em linha (sem preenchimento, traço de 1–1,5px).
- * Cada traço usa pathLength=1 para poder "se desenhar" na entrada.
  * ------------------------------------------------------------------ */
-function Traco({ d, n = 0 }) {
-  return <path d={d} pathLength="1" style={{ "--n": n }} />;
+function Traco({ d }) {
+  return <path d={d} />;
 }
 
 export function Ramo({ className = "" }) {
   return <svg className={`linha ${className}`} viewBox="0 0 150 170" aria-hidden="true" focusable="false">
-    <Traco n={0} d="M24 164c19-28 47-57 72-72 16-9 24-22 26-42M62 120c-4-27-14-45-27-62m43 48c14 1 34 3 44 16" />
-    <Traco n={1} d="M95 92c-1-24 13-50 27-68 7 28-1 53-27 68Zm-47-15C26 76 13 54 13 19c23 10 40 34 35 58Zm16 45c-23 9-43 3-60-11 19-9 45-10 60 11Zm33-13c14-8 35-4 47 13-16 10-36 5-47-13Z" />
-    <Traco n={2} d="M38 61 20 33m31 86-31-7m92 1 21 7m-30-41 14-38" />
-    <Traco n={3} d="M74 113c-11 7-18 29-9 42 7 5 24-3 34-12 9-8 1-22-9-26l-10 3-6-7Zm2 2 4-9 8 9 10-1-8 7" />
-    <Traco n={4} d="m72 134 2 3m11-4 2 2m-13 10 2 2m17-9 2 2" />
+    <Traco d="M24 164c19-28 47-57 72-72 16-9 24-22 26-42M62 120c-4-27-14-45-27-62m43 48c14 1 34 3 44 16" />
+    <Traco d="M95 92c-1-24 13-50 27-68 7 28-1 53-27 68Zm-47-15C26 76 13 54 13 19c23 10 40 34 35 58Zm16 45c-23 9-43 3-60-11 19-9 45-10 60 11Zm33-13c14-8 35-4 47 13-16 10-36 5-47-13Z" />
+    <Traco d="M38 61 20 33m31 86-31-7m92 1 21 7m-30-41 14-38" />
+    <Traco d="M74 113c-11 7-18 29-9 42 7 5 24-3 34-12 9-8 1-22-9-26l-10 3-6-7Zm2 2 4-9 8 9 10-1-8 7" />
+    <Traco d="m72 134 2 3m11-4 2 2m-13 10 2 2m17-9 2 2" />
   </svg>;
 }
 
@@ -211,28 +132,28 @@ export function Limao({ className = "" }) {
     return `M${ponto(24)}L${ponto(35)}`;
   }).join("");
   return <svg className={`linha ${className}`} viewBox="0 0 138 120" aria-hidden="true" focusable="false">
-    <Traco n={0} d="M112 60a52 52 0 1 1-104 0a52 52 0 1 1 104 0Z" />
-    <Traco n={1} d="M105 60a45 45 0 1 1-90 0a45 45 0 1 1 90 0Z" />
-    <Traco n={2} d={cunhas} />
-    <Traco n={3} d={fibras} />
-    <Traco n={4} d="M92 22C104 8 123 7 131 14C124 29 104 31 92 22ZM96 20C108 16 118 15 126 15" />
+    <Traco d="M112 60a52 52 0 1 1-104 0a52 52 0 1 1 104 0Z" />
+    <Traco d="M105 60a45 45 0 1 1-90 0a45 45 0 1 1 90 0Z" />
+    <Traco d={cunhas} />
+    <Traco d={fibras} />
+    <Traco d="M92 22C104 8 123 7 131 14C124 29 104 31 92 22ZM96 20C108 16 118 15 126 15" />
   </svg>;
 }
 
 export function Picole({ className = "" }) {
   return <svg className={`linha ${className}`} viewBox="0 0 70 150" aria-hidden="true" focusable="false">
-    <Traco n={0} d="M10 52C10 14 60 14 60 52V94C60 102 55 106 49 106H21C15 106 10 102 10 94Z" />
-    <Traco n={1} d="M29 106V138C29 144 41 144 41 138V106" />
-    <Traco n={2} d="M20 40C20 31 27 26 35 25" />
-    <Traco n={3} d="M23 62V88M35 58V92M47 62V88" />
+    <Traco d="M10 52C10 14 60 14 60 52V94C60 102 55 106 49 106H21C15 106 10 102 10 94Z" />
+    <Traco d="M29 106V138C29 144 41 144 41 138V106" />
+    <Traco d="M20 40C20 31 27 26 35 25" />
+    <Traco d="M23 62V88M35 58V92M47 62V88" />
   </svg>;
 }
 
 export function Morango({ className = "" }) {
   return <svg className={`linha ${className}`} viewBox="0 0 110 120" aria-hidden="true" focusable="false">
-    <Traco n={0} d="M55 30C26 26 8 50 20 80C28 98 44 110 55 114C66 110 82 98 90 80C102 50 84 26 55 30Z" />
-    <Traco n={1} d="M55 30C44 30 34 24 30 14C42 14 51 20 55 30ZM55 30C66 30 76 24 80 14C68 14 59 20 55 30ZM55 30C52 22 52 14 55 6C58 14 58 22 55 30Z" />
-    <Traco n={2} d="M38 52v4M55 50v4M72 52v4M30 70v4M46 68v4M64 68v4M80 70v4M40 86v4M55 88v4M70 86v4" />
+    <Traco d="M55 30C26 26 8 50 20 80C28 98 44 110 55 114C66 110 82 98 90 80C102 50 84 26 55 30Z" />
+    <Traco d="M55 30C44 30 34 24 30 14C42 14 51 20 55 30ZM55 30C66 30 76 24 80 14C68 14 59 20 55 30ZM55 30C52 22 52 14 55 6C58 14 58 22 55 30Z" />
+    <Traco d="M38 52v4M55 50v4M72 52v4M30 70v4M46 68v4M64 68v4M80 70v4M40 86v4M55 88v4M70 86v4" />
   </svg>;
 }
 

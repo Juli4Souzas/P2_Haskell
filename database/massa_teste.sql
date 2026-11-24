@@ -1,13 +1,17 @@
 -- StockEasy | Massa de teste para a base pimpinella
 -- Execute depois de criar as tabelas e cadastrar Picolé, Pote, Fruta e Leite.
 -- No Docker, monte como /docker-entrypoint-initdb.d/02-massa-teste.sql.
--- As datas são relativas ao dia da carga em Santos (UTC-3).
+-- As datas são relativas ao dia da carga, no horário de Brasília (UTC-3).
+
+-- Lê este arquivo como UTF-8 (sem isso, "Limão" vira "LimÃ£o" no banco).
+SET NAMES utf8mb4;
+SET time_zone = '-03:00';
 
 USE pimpinella;
 
 START TRANSACTION;
 
-SET @hoje = DATE(UTC_TIMESTAMP() - INTERVAL 3 HOUR);
+SET @hoje = CURDATE();
 
 INSERT INTO sabores (nome) VALUES
     ('Morango'),

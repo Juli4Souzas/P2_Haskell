@@ -44,30 +44,56 @@ Ajudar a sorveteria a acompanhar o estoque e reduzir desperdícios. Se dois lote
 ├── backend/                 API em Haskell (Servant + Warp)
 │   ├── app/
 │   │   ├── Main.hs          inicia o servidor na porta 8080
-│   │   ├── Models.hs        tipos (Cadastro, Lote, Saida)
+│   │   ├── Models.hs        tipos (Cadastro, Lote, Saida, respostas)
 │   │   ├── Queries.hs       consultas SQL (mysql-simple)
 │   │   └── Handler.hs       rotas (type API) e handlers
 │   ├── stockeasy.cabal
 │   └── Dockerfile
 ├── database/
 │   ├── stockeasy.sql        criação das tabelas
-│   └── massa_teste.sql      dados de teste
+│   |__ massa_teste.sql      dados de teste
 ├── frontend/                React + Vite
+│   └── src/
+│       ├── main.jsx         aplicativo: estado, dados e navegação
+│       ├── paginas/         Vitrine.jsx, Estoque.jsx, Cardapio.jsx
+│       ├── Editor.jsx       janela de edição (formulários)
+│       ├── componentes.jsx  menu, rodapé, títulos e etiquetas
+│       ├── AbreVitrine.jsx  abertura da Vitrine (prato girando)
+│       ├── organico.jsx     manchas, ondas e ilustrações (paradas)
+│       ├── estoque.js       regras de data, situação e prioridade
+│       └── api.js           chamadas à API Haskell
+│   └── src/
+│       ├── main.jsx         estado geral, carregamento e navegação
+│       ├── componentes.jsx  menu, título das páginas, rodapé, transição
+│       ├── Editor.jsx       janela de edição (formulários e validação)
+│       ├── paginas/         Vitrine.jsx, Estoque.jsx, Cardapio.jsx
+│       ├── api.js           chamadas à API Haskell
+│       ├── estoque.js       regras de data, situação e prioridade
+│       ├── AbreVitrine.jsx  topo animado da Vitrine
+│       ├── organico.jsx     manchas, ondas e ilustrações
+│       └── style.css
 └── compose.yaml             sobe MySQL + API + front
 ```
 
 ## 🔌 Rotas
 
-| Método | Rota | Corpo |
-| --- | --- | --- |
-| GET | `/api/categorias` | – |
-| GET / POST | `/api/sabores` | `{ "id": 0, "nome": "Pistache" }` |
-| PUT / DELETE | `/api/sabores/:id` | `{ "id": 1, "nome": "Pistache" }` |
-| GET / POST | `/api/linhas` | igual a sabores |
-| PUT / DELETE | `/api/linhas/:id` | igual a sabores |
-| GET / POST | `/api/lotes` | `{ "id": 0, "sabor_id": 1, "categoria_id": 1, "linha_id": 1, "quantidade": 10, "validade": "2026-12-01" }` |
-| PUT / DELETE | `/api/lotes/:id` | mesmo corpo do POST |
-| POST | `/api/lotes/:id/saida` | `{ "saida": 3 }` |
+| Método | Rota | Corpo enviado | Resposta |
+| --- | --- | --- | --- |
+| GET | `/api/categorias` | – | `{ "cadastros": [ { "id": 1, "nome": "Picolé" } ] }` |
+| GET | `/api/sabores` | – | `{ "cadastros": [...] }` |
+| POST | `/api/sabores` | `{ "id": 0, "nome": "Pistache" }` | `{ "resultado": 8 }` (id criado) |
+| PUT | `/api/sabores/:id` | `{ "id": 1, "nome": "Pistache" }` | vazio (200) |
+| DELETE | `/api/sabores/:id` | – | vazio (200) |
+| GET / POST | `/api/linhas` | igual a sabores | igual a sabores |
+| PUT / DELETE | `/api/linhas/:id` | igual a sabores | vazio (200) |
+| GET | `/api/lotes` | – | `{ "lotes": [...] }` |
+| GET | `/api/lotes/:id` | – | o lote, ou 404 |
+| POST | `/api/lotes` | `{ "id": 0, "sabor_id": 1, "categoria_id": 1, "linha_id": 1, "quantidade": 10, "validade": "2026-12-01" }` | `{ "resultado": 13 }` |
+| PUT | `/api/lotes/:id` | mesmo corpo do POST | vazio (200) |
+| DELETE | `/api/lotes/:id` | – | vazio (200) |
+| PATCH | `/api/lotes/:id/saida` | `{ "saida": 3 }` | vazio (200) |
+
+Erros voltam como `{ "erro": "mensagem" }` com 400, 404 ou 409.
 
 ## ▶️ Como rodar
 
@@ -78,7 +104,7 @@ Na raiz do projeto:
 docker compose up --build
 ```
 
-Isso sobe o MySQL (com a massa de teste), a API Haskell e o front.
+Isso sobe o MySQL (com a massa de teste), a API Haskell e o front, todos no horário de Brasília (UTC-3).
 A primeira vez demora (10–20 min), porque compila as bibliotecas do Haskell; depois fica em cache.
 
 - Front: porta **5173** (no Codespace, aba **PORTS**)

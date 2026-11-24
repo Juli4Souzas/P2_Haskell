@@ -1,9 +1,7 @@
-FROM haskell:9.10
+FROM haskell:9.10-bookworm
 
 # Bibliotecas que o mysql-simple precisa
-# (Debian 11 saiu do espelho de segurança; usa o snapshot já previsto na imagem)
-RUN sed -i -e 's|^deb |#deb |' -e 's|^# deb http://snapshot|deb [check-valid-until=no] http://snapshot|' /etc/apt/sources.list && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y default-libmysqlclient-dev libpcre3-dev pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
