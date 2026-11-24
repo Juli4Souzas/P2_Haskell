@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -11,12 +12,29 @@ import "./style.css";
 
 const paginas = [["vitrine", "Vitrine do Dia"], ["estoque", "Estoque"], ["cardapio", "Cardápio"]];
 const situacoes = { Vencido: "Vencidos", "Vence em breve": "Vencem em breve", Disponível: "Disponíveis", Zerado: "Zerados" };
+=======
+import React, { useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
+import { fuso, hoje } from "./estoque";
+import { buscarTudo } from "./api";
+import { Marca, Nav, Rodape, paginas } from "./componentes";
+import Vitrine from "./paginas/Vitrine";
+import Estoque from "./paginas/Estoque";
+import Cardapio from "./paginas/Cardapio";
+import Editor from "./Editor";
+import "./style.css";
+
+// Aplicativo: estado geral, carregamento dos dados e navegação entre as páginas.
+// Cada página fica em src/paginas/, a janela de edição em Editor.jsx e as peças
+// comuns (menu, rodapé, títulos) em componentes.jsx.
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
 
 function rotaAtual() {
   const rota = location.hash.slice(1);
   return [...paginas.map(([id]) => id), "estoque-vencidos"].includes(rota) ? rota : "vitrine";
 }
 
+<<<<<<< HEAD
 function Marca() {
   return <a className="marca" href="#vitrine" aria-label="StockEasy, início">StockEasy<span className="marca-ponto" aria-hidden="true" /></a>;
 }
@@ -414,6 +432,8 @@ function Rodape({ pagina, pausado, alternarMovimento }) {
   </footer>;
 }
 
+=======
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
 // Quais registros mudaram, para destacar as linhas recém-salvas.
 function marcarAlteracoes(antes, depois) {
   const marcas = new Set();
@@ -429,6 +449,7 @@ function marcarAlteracoes(antes, depois) {
 const semDados = { sabores: [], categorias: [], linhas: [], lotes: [] };
 
 function App() {
+<<<<<<< HEAD
   const [pausaManual, setPausaManual] = useState(false);
   const [movimentoReduzido, setMovimentoReduzido] = useState(() => matchMedia("(prefers-reduced-motion: reduce)").matches);
   const pausado = pausaManual || movimentoReduzido;
@@ -443,19 +464,30 @@ function App() {
     return () => preferencia.removeEventListener("change", atualizar);
   }, []);
 
+=======
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
   const [dados, setDados] = useState(semDados);
   const [rota, setRota] = useState(rotaAtual);
   const [editor, setEditor] = useState(null);
   const [aviso, setAviso] = useState("");
   const [marcas, setMarcas] = useState(() => new Set());
+<<<<<<< HEAD
   const [fase, setFase] = useState("parado");
   const tempoAviso = useRef();
   const tempoMarcas = useRef();
   const temposTransicao = useRef([]);
+=======
+  // Pausa do prato de sorvete girando (botão na abertura da Vitrine).
+  const [pausado, setPausado] = useState(false);
+  const alternarMovimento = () => setPausado(valor => !valor);
+  const tempoAviso = useRef();
+  const tempoMarcas = useRef();
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
   const pagina = rota === "estoque-vencidos" ? "estoque" : rota;
   const data = hoje();
 
   useEffect(() => {
+<<<<<<< HEAD
     function irPara() {
       setRota(rotaAtual());
       window.scrollTo(0, 0);
@@ -473,6 +505,15 @@ function App() {
     return () => {
       window.removeEventListener("hashchange", navegar);
       temposTransicao.current.forEach(clearTimeout);
+=======
+    function navegar() {
+      setRota(rotaAtual());
+      window.scrollTo(0, 0);
+    }
+    window.addEventListener("hashchange", navegar);
+    return () => {
+      window.removeEventListener("hashchange", navegar);
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
       clearTimeout(tempoAviso.current);
       clearTimeout(tempoMarcas.current);
     };
@@ -505,6 +546,7 @@ function App() {
     avisar("Alteração salva.");
   }
 
+<<<<<<< HEAD
   return <Movimento.Provider value={pausado}>
     <div className={pausado ? "site movimento-pausado" : "site"} data-pagina={pagina}>
       <header className="limite cabecalho">
@@ -523,6 +565,23 @@ function App() {
       <Transicao fase={fase} />
     </div>
   </Movimento.Provider>;
+=======
+  return <div className={pausado ? "site movimento-pausado" : "site"} data-pagina={pagina}>
+    <header className="limite cabecalho">
+      <div className="identidade"><Marca /><span>Sorveteria Pinpinela</span></div>
+      <Nav pagina={pagina} />
+      <time dateTime={data}>{new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "long", timeZone: fuso }).format(new Date())}</time>
+    </header>
+    <main>
+      {pagina === "vitrine" && <Vitrine dados={dados} data={data} pausado={pausado} alternarMovimento={alternarMovimento} />}
+      {pagina === "estoque" && <Estoque key={rota} dados={dados} data={data} somenteVencidos={rota === "estoque-vencidos"} abrir={abrir} marcas={marcas} />}
+      {pagina === "cardapio" && <Cardapio dados={dados} abrir={abrir} marcas={marcas} />}
+    </main>
+    <Rodape pagina={pagina} />
+    {editor && <Editor editor={editor} dados={dados} fechar={() => setEditor(null)} concluir={concluir} />}
+    <div className="aviso" role="status" hidden={!aviso}><span className="aviso-ponto" aria-hidden="true" />{aviso}</div>
+  </div>;
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
 }
 
 createRoot(document.getElementById("root")).render(<App />);

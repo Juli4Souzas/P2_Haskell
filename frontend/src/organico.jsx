@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { createContext, useContext, useEffect, useMemo, useRef } from "react";
 
 /* ------------------------------------------------------------------ *
@@ -48,6 +49,11 @@ function usarRelogio(ref, desenhar, pausado, inicio = 0, observar = true) {
     return () => { io.disconnect(); desligar(); };
   }, [pausado]);
 }
+=======
+import React from "react";
+
+// Formas orgânicas da página. Todas são desenhadas uma vez e ficam paradas.
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
 
 /* ------------------------------------------------------------------ *
  * Geometria: curva fechada e suave (Catmull-Rom → Bézier)
@@ -67,7 +73,11 @@ function curvaFechada(pontos) {
   return `${d}Z`;
 }
 
+<<<<<<< HEAD
 // Forma líquida no quadro 0–100: cada ponto do contorno respira em ritmo próprio.
+=======
+// Forma líquida no quadro 0–100. `t` escolhe o desenho do contorno (cada `sem` dá uma forma diferente).
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
 export function formaBlob(t, { pontos = 7, amp = .16, vel = .0005, sem = 1 } = {}) {
   const contorno = [];
   for (let i = 0; i < pontos; i++) {
@@ -81,6 +91,7 @@ export function formaBlob(t, { pontos = 7, amp = .16, vel = .0005, sem = 1 } = {
 }
 
 /* ------------------------------------------------------------------ *
+<<<<<<< HEAD
  * Blob: mancha de cor sólida que se transforma devagar
  * cor: ouro | rosa | salvia | areia | ceu
  * ------------------------------------------------------------------ */
@@ -111,13 +122,39 @@ export function MascaraProposito({ alvo }) {
     <defs>
       <clipPath id="mascara-proposito" clipPathUnits="objectBoundingBox">
         <path ref={caminho} d={inicial} transform="translate(-0.068 -0.068) scale(0.01136)" />
+=======
+ * Blob: mancha de cor sólida, parada
+ * cor: ouro | rosa | salvia | areia | ceu
+ * ------------------------------------------------------------------ */
+// pontos, amp, vel e sem só escolhem o desenho; nada se mexe.
+export function Blob({ cor = "ouro", className = "", style, pontos = 7, amp = .16, vel = .0005, sem = 1 }) {
+  const d = formaBlob(sem * 2300, { pontos, amp, vel, sem });
+  return <svg className={`blob ${className}`} style={style} viewBox="0 0 100 100"
+    preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <path d={d} style={{ fill: `var(--${cor})` }} />
+  </svg>;
+}
+
+// Recorte orgânico da foto da seção "Para que serve o StockEasy?".
+const contornoProposito = formaBlob(1100, { pontos: 8, amp: .16, vel: .00055, sem: 2 });
+
+export function MascaraProposito() {
+  return <svg className="mascaras" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <clipPath id="mascara-proposito" clipPathUnits="objectBoundingBox">
+        <path d={contornoProposito} transform="translate(-0.068 -0.068) scale(0.01136)" />
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
       </clipPath>
     </defs>
   </svg>;
 }
 
 /* ------------------------------------------------------------------ *
+<<<<<<< HEAD
  * Divisor: borda de seção que ondula e, na parte de baixo, derrete em gotas
+=======
+ * Divisor: borda ondulada de seção; na parte de baixo, com gotas escorrendo (parado)
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
  * lado "cima": a faixa começa aqui (onda sobe sobre a seção anterior)
  * lado "baixo": a faixa termina aqui (gotas escorrem sobre a próxima seção)
  * ------------------------------------------------------------------ */
@@ -142,6 +179,7 @@ function comprimentoGota(indice, t) {
   return 10 + 30 * (.5 + .5 * fase);
 }
 
+<<<<<<< HEAD
 export function Divisor({ cor = "rosa", lado = "cima", gotas = 0, velocidade = 1, amplitude = 1 }) {
   const pausado = usarPausado();
   const svg = useRef(null);
@@ -176,6 +214,21 @@ export function Divisor({ cor = "rosa", lado = "cima", gotas = 0, velocidade = 1
       return <g key={i}>
         <line ref={el => (linhas.current[i] = el)} x1={x} x2={x} y1={n2(topo)} y2={n2(ponta)} />
         <circle ref={el => (pontas.current[i] = el)} cx={x} cy={n2(ponta)} r="11" />
+=======
+export function Divisor({ cor = "rosa", lado = "cima", gotas = 0, amplitude = 1 }) {
+  const t = lado === "cima" ? 900 : 3400;
+  const quantidade = lado === "baixo" ? Math.min(gotas, posicoesGotas.length) : 0;
+  return <svg className={`divisor divisor-${lado} divisor-${cor}`} viewBox={`0 0 ${LARGURA} ${ALTURA}`}
+    preserveAspectRatio={lado === "cima" ? "xMidYMax slice" : "xMidYMin slice"} aria-hidden="true" focusable="false">
+    <path d={caminhoOnda(t, lado, amplitude)} />
+    {Array.from({ length: quantidade }, (_, i) => {
+      const x = posicoesGotas[i] * LARGURA;
+      const topo = alturaOnda(x, t, lado, amplitude) - 4;
+      const ponta = alturaOnda(x, t, lado, amplitude) + comprimentoGota(i, t);
+      return <g key={i}>
+        <line x1={x} x2={x} y1={n2(topo)} y2={n2(ponta)} />
+        <circle cx={x} cy={n2(ponta)} r="11" />
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
       </g>;
     })}
   </svg>;
@@ -183,19 +236,33 @@ export function Divisor({ cor = "rosa", lado = "cima", gotas = 0, velocidade = 1
 
 /* ------------------------------------------------------------------ *
  * Ilustrações em linha (sem preenchimento, traço de 1–1,5px).
+<<<<<<< HEAD
  * Cada traço usa pathLength=1 para poder "se desenhar" na entrada.
  * ------------------------------------------------------------------ */
 function Traco({ d, n = 0 }) {
   return <path d={d} pathLength="1" style={{ "--n": n }} />;
+=======
+ * ------------------------------------------------------------------ */
+function Traco({ d }) {
+  return <path d={d} />;
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
 }
 
 export function Ramo({ className = "" }) {
   return <svg className={`linha ${className}`} viewBox="0 0 150 170" aria-hidden="true" focusable="false">
+<<<<<<< HEAD
     <Traco n={0} d="M24 164c19-28 47-57 72-72 16-9 24-22 26-42M62 120c-4-27-14-45-27-62m43 48c14 1 34 3 44 16" />
     <Traco n={1} d="M95 92c-1-24 13-50 27-68 7 28-1 53-27 68Zm-47-15C26 76 13 54 13 19c23 10 40 34 35 58Zm16 45c-23 9-43 3-60-11 19-9 45-10 60 11Zm33-13c14-8 35-4 47 13-16 10-36 5-47-13Z" />
     <Traco n={2} d="M38 61 20 33m31 86-31-7m92 1 21 7m-30-41 14-38" />
     <Traco n={3} d="M74 113c-11 7-18 29-9 42 7 5 24-3 34-12 9-8 1-22-9-26l-10 3-6-7Zm2 2 4-9 8 9 10-1-8 7" />
     <Traco n={4} d="m72 134 2 3m11-4 2 2m-13 10 2 2m17-9 2 2" />
+=======
+    <Traco d="M24 164c19-28 47-57 72-72 16-9 24-22 26-42M62 120c-4-27-14-45-27-62m43 48c14 1 34 3 44 16" />
+    <Traco d="M95 92c-1-24 13-50 27-68 7 28-1 53-27 68Zm-47-15C26 76 13 54 13 19c23 10 40 34 35 58Zm16 45c-23 9-43 3-60-11 19-9 45-10 60 11Zm33-13c14-8 35-4 47 13-16 10-36 5-47-13Z" />
+    <Traco d="M38 61 20 33m31 86-31-7m92 1 21 7m-30-41 14-38" />
+    <Traco d="M74 113c-11 7-18 29-9 42 7 5 24-3 34-12 9-8 1-22-9-26l-10 3-6-7Zm2 2 4-9 8 9 10-1-8 7" />
+    <Traco d="m72 134 2 3m11-4 2 2m-13 10 2 2m17-9 2 2" />
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
   </svg>;
 }
 
@@ -211,28 +278,49 @@ export function Limao({ className = "" }) {
     return `M${ponto(24)}L${ponto(35)}`;
   }).join("");
   return <svg className={`linha ${className}`} viewBox="0 0 138 120" aria-hidden="true" focusable="false">
+<<<<<<< HEAD
     <Traco n={0} d="M112 60a52 52 0 1 1-104 0a52 52 0 1 1 104 0Z" />
     <Traco n={1} d="M105 60a45 45 0 1 1-90 0a45 45 0 1 1 90 0Z" />
     <Traco n={2} d={cunhas} />
     <Traco n={3} d={fibras} />
     <Traco n={4} d="M92 22C104 8 123 7 131 14C124 29 104 31 92 22ZM96 20C108 16 118 15 126 15" />
+=======
+    <Traco d="M112 60a52 52 0 1 1-104 0a52 52 0 1 1 104 0Z" />
+    <Traco d="M105 60a45 45 0 1 1-90 0a45 45 0 1 1 90 0Z" />
+    <Traco d={cunhas} />
+    <Traco d={fibras} />
+    <Traco d="M92 22C104 8 123 7 131 14C124 29 104 31 92 22ZM96 20C108 16 118 15 126 15" />
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
   </svg>;
 }
 
 export function Picole({ className = "" }) {
   return <svg className={`linha ${className}`} viewBox="0 0 70 150" aria-hidden="true" focusable="false">
+<<<<<<< HEAD
     <Traco n={0} d="M10 52C10 14 60 14 60 52V94C60 102 55 106 49 106H21C15 106 10 102 10 94Z" />
     <Traco n={1} d="M29 106V138C29 144 41 144 41 138V106" />
     <Traco n={2} d="M20 40C20 31 27 26 35 25" />
     <Traco n={3} d="M23 62V88M35 58V92M47 62V88" />
+=======
+    <Traco d="M10 52C10 14 60 14 60 52V94C60 102 55 106 49 106H21C15 106 10 102 10 94Z" />
+    <Traco d="M29 106V138C29 144 41 144 41 138V106" />
+    <Traco d="M20 40C20 31 27 26 35 25" />
+    <Traco d="M23 62V88M35 58V92M47 62V88" />
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
   </svg>;
 }
 
 export function Morango({ className = "" }) {
   return <svg className={`linha ${className}`} viewBox="0 0 110 120" aria-hidden="true" focusable="false">
+<<<<<<< HEAD
     <Traco n={0} d="M55 30C26 26 8 50 20 80C28 98 44 110 55 114C66 110 82 98 90 80C102 50 84 26 55 30Z" />
     <Traco n={1} d="M55 30C44 30 34 24 30 14C42 14 51 20 55 30ZM55 30C66 30 76 24 80 14C68 14 59 20 55 30ZM55 30C52 22 52 14 55 6C58 14 58 22 55 30Z" />
     <Traco n={2} d="M38 52v4M55 50v4M72 52v4M30 70v4M46 68v4M64 68v4M80 70v4M40 86v4M55 88v4M70 86v4" />
+=======
+    <Traco d="M55 30C26 26 8 50 20 80C28 98 44 110 55 114C66 110 82 98 90 80C102 50 84 26 55 30Z" />
+    <Traco d="M55 30C44 30 34 24 30 14C42 14 51 20 55 30ZM55 30C66 30 76 24 80 14C68 14 59 20 55 30ZM55 30C52 22 52 14 55 6C58 14 58 22 55 30Z" />
+    <Traco d="M38 52v4M55 50v4M72 52v4M30 70v4M46 68v4M64 68v4M80 70v4M40 86v4M55 88v4M70 86v4" />
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
   </svg>;
 }
 

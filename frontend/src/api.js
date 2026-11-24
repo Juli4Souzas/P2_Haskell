@@ -15,14 +15,32 @@ async function pedir(caminho, metodo = "GET", corpo) {
     const erro = await resposta.json().catch(() => ({}));
     throw new Error(erro.erro ?? "Não foi possível concluir a operação.");
   }
+<<<<<<< HEAD
   return resposta.status === 204 ? null : resposta.json();
 }
 
+=======
+  // PUT, DELETE e PATCH respondem NoContent (corpo vazio).
+  const texto = await resposta.text();
+  return texto ? JSON.parse(texto) : null;
+}
+
+// As listas chegam dentro de um objeto: { "cadastros": [...] } e { "lotes": [...] }
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
 export async function buscarTudo() {
   const [sabores, categorias, linhas, lotes] = await Promise.all([
     pedir("/sabores"), pedir("/categorias"), pedir("/linhas"), pedir("/lotes")
   ]);
+<<<<<<< HEAD
   return { sabores, categorias, linhas, lotes };
+=======
+  return {
+    sabores: sabores.cadastros,
+    categorias: categorias.cadastros,
+    linhas: linhas.cadastros,
+    lotes: lotes.lotes
+  };
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
 }
 
 const rotas = { sabor: "/sabores", linha: "/linhas" };
@@ -47,7 +65,11 @@ export function gravar({ tipo, item }, valores) {
       return item ? pedir(`/lotes/${item.id}`, "PUT", corpo) : pedir("/lotes", "POST", corpo);
     }
     case "saida":
+<<<<<<< HEAD
       return pedir(`/lotes/${item.id}/saida`, "POST", { saida: Number(valores.get("saida")) });
+=======
+      return pedir(`/lotes/${item.id}/saida`, "PATCH", { saida: Number(valores.get("saida")) });
+>>>>>>> 360d4dc (refactor: Organização das pastas e arquivos)
     case "excluirCadastro":
       return pedir(`${rotas[item.tipo]}/${item.id}`, "DELETE");
     case "excluirLote":
