@@ -1,9 +1,3 @@
-/* Renderiza 120 quadros RGBA de 224 × 266, de cima para baixo.
- * No Linux com Mesa, na raiz do projeto:
- * cc -O2 scripts/render-pote.c -l:libEGL.so.1 -l:libGL.so.1 -o /tmp/render-pote
- * EGL_PLATFORM=surfaceless /tmp/render-pote
- * Empacote frames.rgba em uma grade WebP de 10 colunas por 12 linhas.
- */
 #include <stdio.h>
 #include <stdlib.h>
 

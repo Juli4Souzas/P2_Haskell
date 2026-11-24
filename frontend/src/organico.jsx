@@ -1,10 +1,5 @@
 import React from "react";
 
-// Formas orgânicas da página. Todas são desenhadas uma vez e ficam paradas.
-
-/* ------------------------------------------------------------------ *
- * Geometria: curva fechada e suave (Catmull-Rom → Bézier)
- * ------------------------------------------------------------------ */
 const n2 = valor => valor.toFixed(2);
 
 function curvaFechada(pontos) {
@@ -33,11 +28,7 @@ export function formaBlob(t, { pontos = 7, amp = .16, vel = .0005, sem = 1 } = {
   return curvaFechada(contorno);
 }
 
-/* ------------------------------------------------------------------ *
- * Blob: mancha de cor sólida, parada
- * cor: ouro | rosa | salvia | areia | ceu
- * ------------------------------------------------------------------ */
-// pontos, amp, vel e sem só escolhem o desenho; nada se mexe.
+
 export function Blob({ cor = "ouro", className = "", style, pontos = 7, amp = .16, vel = .0005, sem = 1 }) {
   const d = formaBlob(sem * 2300, { pontos, amp, vel, sem });
   return <svg className={`blob ${className}`} style={style} viewBox="0 0 100 100"
@@ -46,7 +37,6 @@ export function Blob({ cor = "ouro", className = "", style, pontos = 7, amp = .1
   </svg>;
 }
 
-// Recorte orgânico da foto da seção "Para que serve o StockEasy?".
 const contornoProposito = formaBlob(1100, { pontos: 8, amp: .16, vel: .00055, sem: 2 });
 
 export function MascaraProposito() {
@@ -59,11 +49,7 @@ export function MascaraProposito() {
   </svg>;
 }
 
-/* ------------------------------------------------------------------ *
- * Divisor: borda ondulada de seção; na parte de baixo, com gotas escorrendo (parado)
- * lado "cima": a faixa começa aqui (onda sobe sobre a seção anterior)
- * lado "baixo": a faixa termina aqui (gotas escorrem sobre a próxima seção)
- * ------------------------------------------------------------------ */
+
 const LARGURA = 1440;
 const ALTURA = 120;
 const PASSO = 24;
@@ -103,9 +89,6 @@ export function Divisor({ cor = "rosa", lado = "cima", gotas = 0, amplitude = 1 
   </svg>;
 }
 
-/* ------------------------------------------------------------------ *
- * Ilustrações em linha (sem preenchimento, traço de 1–1,5px).
- * ------------------------------------------------------------------ */
 function Traco({ d }) {
   return <path d={d} />;
 }

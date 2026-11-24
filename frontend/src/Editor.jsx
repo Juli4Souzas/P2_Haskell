@@ -4,7 +4,6 @@ import { buscarTudo, gravar } from "./api";
 import { Blob } from "./organico";
 import { OpcoesCadastro, cadastros } from "./componentes";
 
-// Janela de edição: monta os campos de cada tipo, confere os valores e grava na API.
 function camposDoEditor(tipo, item, dados) {
   const cadastro = cadastros[tipo];
   if (cadastro) return {
@@ -102,7 +101,6 @@ export default function Editor({ editor, dados, fechar, concluir }) {
     return () => dialogo.close();
   }, []);
 
-  // Valida no navegador, grava na API e recarrega os dados do banco.
   async function enviar(evento) {
     evento.preventDefault();
     const valores = new FormData(evento.currentTarget);

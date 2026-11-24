@@ -1,4 +1,3 @@
-// Horário de Brasília (UTC-3). O IANA não tem "America/Brasilia": o fuso oficial é este.
 export const fuso = "America/Sao_Paulo";
 
 export function hoje() {
@@ -66,14 +65,12 @@ export function lotesDaVitrine(lotes, data) {
   };
 }
 
-// Dias inteiros entre hoje e a validade (0 = vence hoje, negativo = já venceu).
 export function diasAte(validade, data) {
   const [a, m, d] = validade.split("-").map(Number);
   const [a2, m2, d2] = data.split("-").map(Number);
   return Math.round((Date.UTC(a, m - 1, d) - Date.UTC(a2, m2 - 1, d2)) / 86400000);
 }
 
-// alta: vence hoje ou amanhã · media: em até 3 dias · baixa: sem pressa
 export function urgencia(validade, data) {
   const dias = diasAte(validade, data);
   return dias <= 1 ? "alta" : dias <= 3 ? "media" : "baixa";

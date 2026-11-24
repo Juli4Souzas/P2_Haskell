@@ -19,13 +19,6 @@ import Servant
 import Models
 import Queries
 
-------------------------------------------------------------------
--- Rotas (tipo API)
--- No Servant as rotas são declaradas neste tipo; a função server, lá embaixo,
--- liga cada rota ao seu handler na mesma ordem.
-------------------------------------------------------------------
-
--- Sabores e linhas têm as mesmas 4 rotas; só muda o nome na URL.
 type RotasCadastro =
        Get '[JSON] CadastrosResposta                                       -- GET    /api/sabores
   :<|> ReqBody '[JSON] Cadastro :> Post '[JSON] Resultado                  -- POST   /api/sabores
@@ -44,22 +37,16 @@ type API = "api" :>
   :<|> "lotes" :> Capture "id" Int :> "saida" :> ReqBody '[JSON] Saida :> Patch '[JSON] NoContent
   )
 
--- Abre a conexão, executa a consulta e fecha a conexão.
--- (Uma conexão por requisição: o front faz 4 GETs ao mesmo tempo e
--- uma conexão MySQL única não pode ser usada por várias requisições juntas.)
 banco :: ConnectInfo -> (Connection -> IO a) -> Handler a
 banco info acao = liftIO (bracket (connect info) close acao)
 
--- Devolve o erro em JSON: { "erro": "mensagem" }
+
 erro :: ServerError -> Text -> Handler a
 erro codigo mensagem = throwError codigo
     { errBody    = encode (object ["erro" .= mensagem])
     , errHeaders = [("Content-Type", "application/json; charset=utf-8")]
     }
 
-------------------------------------------------------------------
--- Categorias, sabores e linhas
-------------------------------------------------------------------
 
 handlerCategorias :: ConnectInfo -> Handler CadastrosResposta
 handlerCategorias info = handlerListar "categoria" info
@@ -84,8 +71,7 @@ handlerEditar tabela info ident cadastro = do
     when (not existe) $ erro err404 "Cadastro não encontrado."
     repetido <- banco info (\conn -> nomeRepetido conn tabela ident novoNome)
     when repetido $ erro err409 "Já existe um cadastro com esse nome."
-    -- O MySQL devolve 0 linhas alteradas quando o nome não mudou,
-    -- por isso a existência é conferida antes, e não pelo resultado do UPDATE.
+   
     _ <- banco info (\conn -> editarCadastro conn tabela ident novoNome)
     pure NoContent
 
@@ -98,14 +84,10 @@ handlerExcluir tabela coluna info ident = do
         then pure NoContent
         else erro err404 "Cadastro não encontrado."
 
-------------------------------------------------------------------
--- Lotes
-------------------------------------------------------------------
 
 handlerLotes :: ConnectInfo -> Handler LotesResposta
 handlerLotes info = LotesResposta <$> banco info listarLotes
 
--- GET /api/lotes/:id (200 com o lote ou 404)
 handlerLote :: ConnectInfo -> Int -> Handler Lote
 handlerLote info ident = do
     encontrado <- banco info (\conn -> buscarLote conn ident)
@@ -113,7 +95,6 @@ handlerLote info ident = do
         Just lote -> pure lote
         Nothing   -> erro err404 "Lote não encontrado."
 
--- minimo = 1 ao criar e 0 ao editar (um lote editado pode ficar zerado)
 validarLote :: ConnectInfo -> Int -> Lote -> Handler ()
 validarLote info minimo lote = do
     when (quantidade lote < minimo) $ erro err400 "Confira a quantidade."
@@ -140,7 +121,6 @@ handlerExcluirLote info ident = do
         then pure NoContent
         else erro err404 "Lote não encontrado."
 
--- PATCH /api/lotes/:id/saida: muda só a quantidade do lote.
 handlerSaida :: ConnectInfo -> Int -> Saida -> Handler NoContent
 handlerSaida info ident (Saida qtd) = do
     lote <- handlerLote info ident
@@ -151,9 +131,6 @@ handlerSaida info ident (Saida qtd) = do
         then pure NoContent
         else erro err400 "Informe uma quantidade dentro do saldo."
 
-------------------------------------------------------------------
--- Servidor (mesma ordem das rotas do tipo API)
-------------------------------------------------------------------
 
 rotasCadastro :: String -> String -> ConnectInfo -> Server RotasCadastro
 rotasCadastro tabela coluna info =

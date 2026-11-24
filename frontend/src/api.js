@@ -1,5 +1,3 @@
-// Chamadas à API Haskell. O Vite repassa /api para http://localhost:8080 (vite.config.js).
-
 async function pedir(caminho, metodo = "GET", corpo) {
   let resposta;
   try {
@@ -15,12 +13,10 @@ async function pedir(caminho, metodo = "GET", corpo) {
     const erro = await resposta.json().catch(() => ({}));
     throw new Error(erro.erro ?? "Não foi possível concluir a operação.");
   }
-  // PUT, DELETE e PATCH respondem NoContent (corpo vazio).
   const texto = await resposta.text();
   return texto ? JSON.parse(texto) : null;
 }
 
-// As listas chegam dentro de um objeto: { "cadastros": [...] } e { "lotes": [...] }
 export async function buscarTudo() {
   const [sabores, categorias, linhas, lotes] = await Promise.all([
     pedir("/sabores"), pedir("/categorias"), pedir("/linhas"), pedir("/lotes")
@@ -35,7 +31,6 @@ export async function buscarTudo() {
 
 const rotas = { sabor: "/sabores", linha: "/linhas" };
 
-// Grava no banco o que foi feito no formulário.
 export function gravar({ tipo, item }, valores) {
   switch (tipo) {
     case "sabor":

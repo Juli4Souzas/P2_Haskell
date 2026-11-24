@@ -1,10 +1,3 @@
-/* ==========================================================================
-   StockEasy · Pinpinela
-   Identidade visual baseada em DESIGN.md (estilo "Pa'lais"):
-   papel creme, tipografia condensada em índigo, manchas orgânicas quentes,
-   ilustrações em linha e divisores ondulados. Fontes carregadas em index.html.
-   ========================================================================== */
-
 :root {
   /* Cores (DESIGN.md → Tokens — Colors) */
   --indigo: #234386;

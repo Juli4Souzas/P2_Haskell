@@ -7,7 +7,6 @@ function proximaSecao() {
   prioridade.scrollIntoView();
 }
 
-// Pausa ou retoma o prato de sorvete girando (a única animação do site).
 export function ControleMovimento({ classe, pausado, alternarMovimento }) {
   const rotulo = pausado ? "Retomar giro do sorvete" : "Pausar giro do sorvete";
   return <button className={`controle-movimento ${classe}`} type="button"
@@ -18,8 +17,7 @@ export function ControleMovimento({ classe, pausado, alternarMovimento }) {
   </button>;
 }
 
-// Abertura da Vitrine: título à esquerda e, à direita, manchas e ilustrações
-// em camadas com o prato de sorvete girando no meio.
+
 export default function AbreVitrine({ pausado, alternarMovimento }) {
   return <section className="hero limite" aria-labelledby="titulo-vitrine">
     <div className="hero-intro">

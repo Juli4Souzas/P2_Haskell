@@ -9,16 +9,12 @@ import Cardapio from "./paginas/Cardapio";
 import Editor from "./Editor";
 import "./style.css";
 
-// Aplicativo: estado geral, carregamento dos dados e navegação entre as páginas.
-// Cada página fica em src/paginas/, a janela de edição em Editor.jsx e as peças
-// comuns (menu, rodapé, títulos) em componentes.jsx.
 
 function rotaAtual() {
   const rota = location.hash.slice(1);
   return [...paginas.map(([id]) => id), "estoque-vencidos"].includes(rota) ? rota : "vitrine";
 }
 
-// Quais registros mudaram, para destacar as linhas recém-salvas.
 function marcarAlteracoes(antes, depois) {
   const marcas = new Set();
   for (const [lista, prefixo] of [["lotes", "lote"], ["sabores", "sabor"], ["linhas", "linha"]]) {
@@ -38,7 +34,8 @@ function App() {
   const [editor, setEditor] = useState(null);
   const [aviso, setAviso] = useState("");
   const [marcas, setMarcas] = useState(() => new Set());
-  // Pausa do prato de sorvete girando (botão na abertura da Vitrine).
+  
+  // Pausa do prato de sorvete girando
   const [pausado, setPausado] = useState(false);
   const alternarMovimento = () => setPausado(valor => !valor);
   const tempoAviso = useRef();

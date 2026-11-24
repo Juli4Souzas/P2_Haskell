@@ -16,7 +16,6 @@ export default function PoteSorvete({ pausado }) {
     const contexto = tela.current.getContext("2d");
     if (!contexto) return;
 
-    // Cada quadro é uma vista do mesmo modelo 3D, renderizada em um ângulo diferente.
     const vistas = new Image();
     let animacao;
     let anterior;

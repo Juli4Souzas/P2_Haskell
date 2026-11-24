@@ -1,13 +1,9 @@
 import React from "react";
 import { Blob, Divisor, Ramo } from "./organico";
 
-// Peças usadas em mais de uma página: menu, rodapé, título das páginas,
-// opções de cadastro e etiquetas de situação.
-
 export const paginas = [["vitrine", "Vitrine do Dia"], ["estoque", "Estoque"], ["cardapio", "Cardápio"]];
 export const situacoes = { Vencido: "Vencidos", "Vence em breve": "Vencem em breve", Disponível: "Disponíveis", Zerado: "Zerados" };
 
-// Sabores e linhas: usados pela página Cardápio e pela janela de edição.
 export const cadastros = {
   sabor: { lista: "sabores", nome: "sabor", titulo: "Sabores", novo: "Novo sabor", maximo: 100, campo: "sabor_id", contador: "proximoSabor" },
   linha: { lista: "linhas", nome: "linha", titulo: "Linhas", novo: "Nova linha", maximo: 50, campo: "linha_id", contador: "proximaLinha" }
@@ -78,7 +74,6 @@ const iconesSituacao = {
 };
 const classesSituacao = { Disponível: "disponivel", "Vence em breve": "breve", Vencido: "vencido", Zerado: "zerado" };
 
-// Cor e ícone reforçam o texto: a situação nunca depende só da cor.
 export function Situacao({ valor }) {
   return <span className={`tag tag-${classesSituacao[valor]}`}>
     <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.7"
